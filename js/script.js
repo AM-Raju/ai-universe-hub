@@ -1,21 +1,26 @@
 // Loading all Ai data
-const loadAiDataFn = async () => {
+const loadAiDataFn = async (limit) => {
   try {
     const url = "https://openapi.programming-hero.com/api/ai/tools";
     const res = await fetch(url);
     const data = await res.json();
     const allAi = data.data.tools;
     // console.log(allAi[4].features);
-    displayAiDataFn(allAi);
+    displayAiDataFn(allAi, limit);
   } catch (err) {
     console.log(err);
   }
 };
 
+// Grabbing Elements
+const modalSection = document.getElementById("modal-section");
+const seeMoreBtn = document.getElementById("see-more");
+
 // Displaying AI data
-const displayAiDataFn = (allAi) => {
+const displayAiDataFn = (allAi, limit) => {
   const cardContainer = document.getElementById("card-container");
-  allAi.forEach((ai) => {
+
+  allAi.slice(0, limit).forEach((ai) => {
     // console.log(ai.features);
     const { id, name, image, published_in, features } = ai;
     // console.log(id);
@@ -58,8 +63,6 @@ const loadAiDetailsFn = async (id) => {
   }
 };
 
-const modalSection = document.getElementById("modal-section");
-
 // closing Modal
 document.getElementById("close-modal").addEventListener("click", () => {
   modalSection.classList.add("hidden");
@@ -73,8 +76,7 @@ const displayAiDetailsFn = (aiDetails) => {
   const modalContainer = document.getElementById("modal-container");
   console.log(modalContainer);
 
-
-  const {description, pricing, image_link, accuracy} = aiDetails;
+  const { description, pricing, image_link, accuracy } = aiDetails;
 
   modalContainer.innerHTML = `
   <!-- Modal Block 1 -->
@@ -128,7 +130,7 @@ const displayAiDetailsFn = (aiDetails) => {
     <button
       class="bg-red-500 px-3 py-1 rounded-md text-white relative lg:left-36 top-10 font-semibold"
     >
-      ${accuracy.score*100}% Accuracy
+      ${accuracy.score * 100}% Accuracy
     </button>
     <img class="rounded-xl md:mx-auto" src="${image_link[0]}" alt="" />
     <h2 class="text-2xl font-semibold my-2">Hi, How are you doing today?</h2>
@@ -137,4 +139,12 @@ const displayAiDetailsFn = (aiDetails) => {
   `;
 };
 
-loadAiDataFn();
+// Action After See More Button clicked
+seeMoreBtn.addEventListener("click", () => {
+  // Erasing existing card from container
+  document.getElementById("card-container").innerHTML = "";
+  // Loading all cards
+  loadAiDataFn();
+});
+
+loadAiDataFn(6);
