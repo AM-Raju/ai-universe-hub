@@ -4,30 +4,32 @@ const seeMoreBtn = document.getElementById("see-more");
 const loading = document.getElementById("loading");
 const sortByDate = document.getElementById("sort-by-date");
 const cardContainer = document.getElementById("card-container");
+const modalContainer = document.getElementById("modal-container");
 
-// Loading all Ai data
+// =============== Loading all Ai data: Function ======================
 const loadAiDataFn = async (limit) => {
   try {
     const url = "https://openapi.programming-hero.com/api/ai/tools";
     const res = await fetch(url);
     const data = await res.json();
     let allAi = data.data.tools;
-    console.log(allAi, "one");
-    //=============================
+
+    //============= Sorting Date Wise: EventListener ================
     sortByDate.addEventListener("click", () => {
       document.getElementById("card-container").innerHTML = "";
       allAi = sortByDateFn(allAi);
       displayAiDataFn(allAi, limit);
     });
-    //=============================
+
+    //=========== Function Call ===============
     displayAiDataFn(allAi, limit);
   } catch (err) {
     console.log(err);
   }
 };
 
+//============= Sorting Date Wise: Function ================
 const sortByDateFn = (allAi) => {
-  console.log(allAi, "Three");
   const customSort = (a, b) => {
     const dateA = new Date(a.published_in);
     const dateB = new Date(b.published_in);
@@ -39,13 +41,12 @@ const sortByDateFn = (allAi) => {
   return allAi;
 };
 
-// Displaying AI data
+// ============ Displaying AI data: Function =================
 const displayAiDataFn = (allAi, limit) => {
-  console.log(allAi, "Two");
-
   allAi.slice(0, limit).forEach((ai) => {
     const { id, name, image, published_in, features } = ai;
-    //=================================================
+
+    // Dynamically adding features into the card
     const orderedFn = (features) => {
       return `
       <ol class="list-decimal list-inside">
@@ -53,7 +54,8 @@ const displayAiDataFn = (allAi, limit) => {
       </ol>
       `;
     };
-    //=================================================
+
+    // Adding innerHtml into Card Container
     cardContainer.innerHTML += `
         <div class="border mx-auto lg:w-[485px] rounded-xl">
         <div class="p-6 mx-auto">
@@ -67,6 +69,7 @@ const displayAiDataFn = (allAi, limit) => {
               <h3 class="text-3xl font-semibold mb-3">${name}</h3>
               <p><i class="mr-3 fa-solid fa-calendar-days"></i>${published_in}</p>
             </div>
+            <!-- Opening Modal and ai details function call -->
             <i onclick="loadAiDetailsFn('${id}')"
               class="open-modal fa-solid fa-arrow-right text-2xl text-red-400 bg-red-50 px-3 py-2 rounded-full"
             ></i>
@@ -79,33 +82,53 @@ const displayAiDataFn = (allAi, limit) => {
   loading.classList.add("hidden");
 };
 
+// ============== Loading Ai Details Data: Function ====================
 const loadAiDetailsFn = async (id) => {
   try {
     const url = `https://openapi.programming-hero.com/api/ai/tool/${id}`;
     const res = await fetch(url);
     const data = await res.json();
-    // console.log(data.data);
     displayAiDetailsFn(data.data);
   } catch (err) {
     console.log(err);
   }
 };
 
-// closing Modal
+// ============== closing Modal: Event Listener ==================
 document.getElementById("close-modal").addEventListener("click", () => {
   modalSection.classList.add("hidden");
 });
 
-// Displaying single AI Details on Modal
+// ============== Displaying single AI Details on Modal: Function ==================
 const displayAiDetailsFn = (aiDetails) => {
-  console.log(aiDetails);
   // Opening modal
   modalSection.classList.remove("hidden");
-  const modalContainer = document.getElementById("modal-container");
-  console.log(modalContainer);
 
-  const { description, pricing, image_link, accuracy } = aiDetails;
+  // Destructuring object
+  const { description, pricing, image_link, accuracy, features, integrations } = aiDetails;
 
+  // Converting object value into array
+  const featuresArr = Object.values(features);
+
+  // Loading Features data into modal: Function
+  const modalFeaturesFn = (featuresArr) => {
+    return `
+  <ul class="list-disc list-inside">
+    ${featuresArr.map((list) => `<li>${list.feature_name}</li>`).join("")}
+  </ul>
+  `;
+  };
+
+  // Loading integrations data into modal: Function
+  const modalIntegrationFn = (integrations) => {
+    return `
+    <ul class="list-disc list-inside">
+    ${integrations.map((list) => `<li>${list}</li>`).join("")}
+  </ul>
+    `;
+  };
+
+  // Adding innerHtml into modal
   modalContainer.innerHTML = `
   <!-- Modal Block 1 -->
   <div
@@ -137,19 +160,11 @@ const displayAiDetailsFn = (aiDetails) => {
     <div class="md:flex justify-between">
       <div class="md:w-[200px]">
         <div class="text-2xl font-semibold mb-4">Features</div>
-        <ul class="list-disc list-inside">
-          <li>Customizable response.</li>
-          <li>Multilingual Support</li>
-          <li>Seamless integration</li>
-        </ul>
+        ${modalFeaturesFn(featuresArr)}
       </div>
       <div class="md:w-[200px]">
         <div class="text-2xl font-semibold mb-4">Integrations</div>
-        <ul class="list-disc list-inside">
-          <li>Customizable response.</li>
-          <li>Multilingual Support</li>
-          <li>Seamless integration</li>
-        </ul>
+          ${modalIntegrationFn(integrations)}
       </div>
     </div>
   </div>
@@ -167,7 +182,7 @@ const displayAiDetailsFn = (aiDetails) => {
   `;
 };
 
-// Action After See More Button clicked
+// =============== Action After See More Button clicked: EventListener ============
 seeMoreBtn.addEventListener("click", () => {
   // Erasing existing card from container
   document.getElementById("card-container").innerHTML = "";
@@ -179,15 +194,5 @@ seeMoreBtn.addEventListener("click", () => {
   // Loading all cards
   loadAiDataFn();
 });
-
-const loadFeaturesFn = (id, features) => {
-  console.log("features");
-  console.log(id);
-  console.log(features);
-  const ol = document.getElementById("id");
-  // features.forEach((feature) => {
-  //   ol.innerHTML += `<li>${feature}</li>`;
-  // });
-};
 
 loadAiDataFn(6);
