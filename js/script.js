@@ -1,39 +1,65 @@
+// Grabbing Elements
+const modalSection = document.getElementById("modal-section");
+const seeMoreBtn = document.getElementById("see-more");
+const loading = document.getElementById("loading");
+const sortByDate = document.getElementById("sort-by-date");
+const cardContainer = document.getElementById("card-container");
+
 // Loading all Ai data
 const loadAiDataFn = async (limit) => {
   try {
     const url = "https://openapi.programming-hero.com/api/ai/tools";
     const res = await fetch(url);
     const data = await res.json();
-    const allAi = data.data.tools;
-    // console.log(allAi[4].features);
+    let allAi = data.data.tools;
+    console.log(allAi, "one");
+    //=============================
+    sortByDate.addEventListener("click", () => {
+      document.getElementById("card-container").innerHTML = "";
+      allAi = sortByDateFn(allAi);
+      displayAiDataFn(allAi, limit);
+    });
+    //=============================
     displayAiDataFn(allAi, limit);
   } catch (err) {
     console.log(err);
   }
 };
 
-// Grabbing Elements
-const modalSection = document.getElementById("modal-section");
-const seeMoreBtn = document.getElementById("see-more");
+const sortByDateFn = (allAi) => {
+  console.log(allAi, "Three");
+  const customSort = (a, b) => {
+    const dateA = new Date(a.published_in);
+    const dateB = new Date(b.published_in);
+    if (dateA > dateB) return 1;
+    else if (dateA < dateB) return -1;
+    return 0;
+  };
+  allAi.sort(customSort);
+  return allAi;
+};
 
 // Displaying AI data
 const displayAiDataFn = (allAi, limit) => {
-  const cardContainer = document.getElementById("card-container");
+  console.log(allAi, "Two");
 
   allAi.slice(0, limit).forEach((ai) => {
-    // console.log(ai.features);
     const { id, name, image, published_in, features } = ai;
-    // console.log(id);
+    //=================================================
+    const orderedFn = (features) => {
+      return `
+      <ol class="list-decimal list-inside">
+      ${features.map((feature) => `<li>${feature}</li>`).join("")}
+      </ol>
+      `;
+    };
+    //=================================================
     cardContainer.innerHTML += `
         <div class="border mx-auto lg:w-[485px] rounded-xl">
         <div class="p-6 mx-auto">
           <img class="rounded-xl h-[245px]" src="${image}" alt="" />
           <h3 class="text-2xl font-semibold my-3">Features</h3>
-          <ol class="list-decimal list-inside">
-          <li>Paste feature here</li>
-          <li>Paste feature here</li>
-          <li>Paste feature here</li>
-          </ol>
+          ${orderedFn(features)}
           <!-- line -->
           <div class="h-0.5 bg-gray-200 my-5"></div>
           <div class="flex justify-between items-center">
@@ -49,6 +75,8 @@ const displayAiDataFn = (allAi, limit) => {
       </div>
         `;
   });
+  // remove loading button after data loading done
+  loading.classList.add("hidden");
 };
 
 const loadAiDetailsFn = async (id) => {
@@ -143,8 +171,23 @@ const displayAiDetailsFn = (aiDetails) => {
 seeMoreBtn.addEventListener("click", () => {
   // Erasing existing card from container
   document.getElementById("card-container").innerHTML = "";
+  // Start loading button before data load
+  loading.classList.remove("hidden");
+  // Removing see more button after loading data
+  seeMoreBtn.classList.add("hidden");
+
   // Loading all cards
   loadAiDataFn();
 });
+
+const loadFeaturesFn = (id, features) => {
+  console.log("features");
+  console.log(id);
+  console.log(features);
+  const ol = document.getElementById("id");
+  // features.forEach((feature) => {
+  //   ol.innerHTML += `<li>${feature}</li>`;
+  // });
+};
 
 loadAiDataFn(6);
