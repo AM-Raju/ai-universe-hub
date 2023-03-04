@@ -128,6 +128,26 @@ const displayAiDetailsFn = (aiDetails) => {
     `;
   };
 
+  // Show/Hide accuracy button
+  const showHideBtn = (score) => {
+    if (score === null) {
+      return `
+      <button
+      class="hidden bg-red-500 px-3 py-1 rounded-md text-white relative lg:left-36 top-10 font-semibold"
+    >
+    </button>
+      `;
+    } else {
+      return `
+      <button
+      class="bg-red-500 px-3 py-1 rounded-md text-white relative lg:left-36 top-10 font-semibold"
+    >
+      ${accuracy.score * 100}% Accuracy
+    </button>
+      `;
+    }
+  };
+
   // Adding innerHtml into modal
   modalContainer.innerHTML = `
   <!-- Modal Block 1 -->
@@ -170,11 +190,7 @@ const displayAiDetailsFn = (aiDetails) => {
   </div>
   <!-- Modal block 2 -->
   <div class="lg:w-[487px] border border-gray-200 p-8 rounded-xl text-center">
-    <button
-      class="bg-red-500 px-3 py-1 rounded-md text-white relative lg:left-36 top-10 font-semibold"
-    >
-      ${accuracy.score * 100}% Accuracy
-    </button>
+    ${showHideBtn(accuracy.score)}
     <img class="rounded-xl md:mx-auto" src="${image_link[0]}" alt="" />
     <h2 class="text-2xl font-semibold my-2">Hi, How are you doing today?</h2>
     <p>${accuracy.description}</p>
