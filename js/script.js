@@ -121,11 +121,15 @@ const displayAiDetailsFn = (aiDetails) => {
 
   // Loading integrations data into modal: Function
   const modalIntegrationFn = (integrations) => {
-    return `
+    if (integrations === null) {
+      return "No Data Found";
+    } else {
+      return `
     <ul class="list-disc list-inside">
     ${integrations.map((list) => `<li>${list}</li>`).join("")}
   </ul>
     `;
+    }
   };
 
   // Show/Hide accuracy button
@@ -163,16 +167,16 @@ const displayAiDetailsFn = (aiDetails) => {
       class="sm:flex justify-between items-center my-8 text-xl lg:text-base text-center"
     >
       <div class="text-green-600 w-52 h-28 bg-white rounded-lg p-4 font-semibold">
-        <h3>${pricing[0].price}</h3>
-        <h3>${pricing[0].plan}</h3>
+        <h3>${pricing ? pricing[0].price : "Free of cost"}</h3>
+        <h3>${pricing ? pricing[0].plan : ""}</h3>
       </div>
       <div class="text-orange-600 w-52 h-28 bg-white rounded-lg p-4 my-5 lg:mx-5 font-semibold">
-      <h3>${pricing[1].price}</h3>
-      <h3>${pricing[1].plan}</h3>
+      <h3>${pricing ? pricing[1].price : "Free of cost"}</h3>
+      <h3>${pricing ? pricing[1].plan : ""}</h3>
       </div>
       <div class="text-red-600 w-52 h-28 bg-white rounded-lg p-4 font-semibold">
-      <h3>${pricing[2].price}</h3>
-      <h3>${pricing[2].plan}</h3>
+      <h3>${pricing ? pricing[2].price : "Free of cost"}</h3>
+      <h3>${pricing ? pricing[2].plan : ""}</h3>
       </div>
     </div>
 
