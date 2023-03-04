@@ -1,4 +1,4 @@
-// Grabbing Elements
+// ==================== Grabbing Elements ========================
 const modalSection = document.getElementById("modal-section");
 const seeMoreBtn = document.getElementById("see-more");
 const loading = document.getElementById("loading");
@@ -33,8 +33,8 @@ const sortByDateFn = (allAi) => {
   const customSort = (a, b) => {
     const dateA = new Date(a.published_in);
     const dateB = new Date(b.published_in);
-    if (dateA > dateB) return 1;
-    else if (dateA < dateB) return -1;
+    if (dateA < dateB) return 1;
+    else if (dateA > dateB) return -1;
     return 0;
   };
   allAi.sort(customSort);
@@ -49,7 +49,7 @@ const displayAiDataFn = (allAi, limit) => {
     // Dynamically adding features into the card
     const orderedFn = (features) => {
       return `
-      <ol class="list-decimal list-inside">
+      <ol class="list-decimal list-inside h-[100px]">
       ${features.map((feature) => `<li>${feature}</li>`).join("")}
       </ol>
       `;
@@ -57,7 +57,7 @@ const displayAiDataFn = (allAi, limit) => {
 
     // Adding innerHtml into Card Container
     cardContainer.innerHTML += `
-        <div class="border mx-auto lg:w-[485px] rounded-xl">
+        <div class="border mx-auto lg:w-[485px] rounded-xl hover:bg-red-50 hover:transition-all">
         <div class="p-6 mx-auto">
           <img class="rounded-xl h-[245px]" src="${image}" alt="" />
           <h3 class="text-2xl font-semibold my-3">Features</h3>
@@ -71,7 +71,7 @@ const displayAiDataFn = (allAi, limit) => {
             </div>
             <!-- Opening Modal and ai details function call -->
             <i onclick="loadAiDetailsFn('${id}')"
-              class="open-modal fa-solid fa-arrow-right text-2xl text-red-400 bg-red-50 px-3 py-2 rounded-full"
+              class="open-modal fa-solid fa-arrow-right text-2xl text-red-400 bg-red-100 px-3 py-2 rounded-full"
             ></i>
           </div>
         </div>
@@ -103,12 +103,6 @@ document.getElementById("close-modal").addEventListener("click", () => {
 const displayAiDetailsFn = (aiDetails) => {
   // Opening modal
   modalSection.classList.remove("hidden");
-
-  // Destructuring object
-  const { description, pricing, image_link, accuracy, features, integrations } = aiDetails;
-
-  // Converting object value into array
-  const featuresArr = Object.values(features);
 
   // Loading Features data into modal: Function
   const modalFeaturesFn = (featuresArr) => {
@@ -152,11 +146,25 @@ const displayAiDetailsFn = (aiDetails) => {
     }
   };
 
+  // Destructuring object
+  const {
+    description,
+    pricing,
+    image_link,
+    accuracy,
+    features,
+    integrations,
+    input_output_examples,
+  } = aiDetails;
+
+  // Converting object value into array
+  const featuresArr = Object.values(features);
+
   // Adding innerHtml into modal
   modalContainer.innerHTML = `
   <!-- Modal Block 1 -->
   <div
-    class="mx-auto md:w-[500px] lg:w-[487px] bg-red-50 border border-red-200 p-8 rounded-xl text-center lg:text-left"
+    class="mx-auto sm:w-[487px] lg:w-[500px] bg-red-50 border border-red-200 p-8 rounded-xl text-center lg:text-left"
   >
     <h2 class="text-2xl font-semibold">
       ${description}
@@ -166,22 +174,22 @@ const displayAiDetailsFn = (aiDetails) => {
     <div
       class="sm:flex justify-between items-center my-8 text-xl lg:text-base text-center"
     >
-      <div class="text-green-600 w-52 h-28 bg-white rounded-lg p-4 font-semibold">
+      <div class="text-green-600 w-52 h-28 bg-white rounded-lg p-4 font-semibold mx-auto">
         <h3>${pricing ? pricing[0].price : "Free of cost"}</h3>
         <h3>${pricing ? pricing[0].plan : ""}</h3>
       </div>
-      <div class="text-orange-600 w-52 h-28 bg-white rounded-lg p-4 my-5 lg:mx-5 font-semibold">
+      <div class="text-orange-600 w-52 h-28 bg-white rounded-lg p-4 my-5 lg:mx-5 font-semibold mx-auto">
       <h3>${pricing ? pricing[1].price : "Free of cost"}</h3>
       <h3>${pricing ? pricing[1].plan : ""}</h3>
       </div>
-      <div class="text-red-600 w-52 h-28 bg-white rounded-lg p-4 font-semibold">
+      <div class="text-red-600 w-52 h-28 bg-white rounded-lg p-4 font-semibold mx-auto">
       <h3>${pricing ? pricing[2].price : "Free of cost"}</h3>
       <h3>${pricing ? pricing[2].plan : ""}</h3>
       </div>
     </div>
 
     <!-- Features & Integrations -->
-    <div class="md:flex justify-between">
+    <div class="grid sm:grid-cols-2 gap-4 text-center sm:text-left">
       <div class="md:w-[200px]">
         <div class="text-2xl font-semibold mb-4">Features</div>
         ${modalFeaturesFn(featuresArr)}
@@ -193,11 +201,13 @@ const displayAiDetailsFn = (aiDetails) => {
     </div>
   </div>
   <!-- Modal block 2 -->
-  <div class="lg:w-[487px] border border-gray-200 p-8 rounded-xl text-center">
+  <div class="lg:w-[487px] border border-gray-200 p-8 rounded-xl text-center mx-auto">
     ${showHideBtn(accuracy.score)}
     <img class="rounded-xl md:mx-auto" src="${image_link[0]}" alt="" />
-    <h2 class="text-2xl font-semibold my-2">Hi, How are you doing today?</h2>
-    <p>${accuracy.description}</p>
+    <h2 class="text-2xl font-semibold my-2">${
+      input_output_examples ? input_output_examples[0].input : "No! Not yet! Take a Break"
+    }</h2>
+    <p>${input_output_examples ? input_output_examples[0].output : ""}</p>
   </div>
   `;
 };
